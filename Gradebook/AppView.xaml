@@ -1,0 +1,97 @@
+﻿<Window x:Class="Gradebook.AppView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Gradebook"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:view="clr-namespace:Gradebook.View"
+        mc:Ignorable="d" 
+        WindowStartupLocation="CenterScreen"
+        Name="GradebookAppView"
+        Title="GradeBook +++" Height="800" Width="1200">
+  <Window.Resources>
+    <Style x:Key="HideHeader" TargetType="{x:Type GridViewColumnHeader}">
+      <Setter Property="Visibility" Value="Collapsed" />
+    </Style>
+  </Window.Resources>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <Menu Grid.Row="0">
+      <MenuItem Header="_File">
+        <MenuItem Header="New" Command="{Binding NewAssignmentCommand, ElementName=GradebookAppView}"/>
+        <MenuItem Header="Open" Command="{Binding OpenAssignmentCommand, ElementName=GradebookAppView}"/>
+        <Separator/>
+        <MenuItem Command="ApplicationCommands.Save"/>
+        <MenuItem Command="ApplicationCommands.SaveAs"/>
+      </MenuItem>
+      <MenuItem Header="_Edit">
+        <MenuItem Command="ApplicationCommands.Copy"/>
+        <MenuItem Command="ApplicationCommands.Cut"/>
+        <MenuItem Command="ApplicationCommands.Paste"/>
+      </MenuItem>
+      <MenuItem Header="_Tools"></MenuItem>
+      <MenuItem Header="_Help">
+        <MenuItem Header="About"/>
+      </MenuItem>
+    </Menu>
+    <Grid Grid.Row="1">
+      <Grid.DataContext>
+        <local:AssignmentViewModel/>
+      </Grid.DataContext>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="0.2*"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <ListView Margin="5" Grid.Column="0" Name="AssignmentListView" ItemsSource="{Binding Assignments}" 
+                SelectionChanged="AssignmentListView_OnSelectionChanged">
+        <ListView.View>
+          <GridView ColumnHeaderContainerStyle="{StaticResource HideHeader}">
+            <GridViewColumn>
+              <GridViewColumn.DisplayMemberBinding>
+                <MultiBinding StringFormat="{}{0}{1}{2}">
+                  <Binding Path="Name"/>
+                  <Binding Source="{x:Static system:Environment.NewLine}"></Binding>
+                  <Binding Path="Due"/>
+                </MultiBinding>
+              </GridViewColumn.DisplayMemberBinding>
+            </GridViewColumn>
+          </GridView>
+        </ListView.View>
+      </ListView>
+      <Grid Margin="5" Grid.Column="1" Name="GradeGrid" IsEnabled="{Binding CurrentAssignment, Converter={view:ObjectToBooleanConverter}}">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="40"/>
+          <RowDefinition Height="*"/>
+          <RowDefinition Height="0.15*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Margin="5" Grid.Row="0" Orientation="Horizontal">
+          <Label>Assignment Name:</Label>
+          <TextBox Width="200" Height="24" Text="{Binding CurrentAssignment.Name}"></TextBox> <!-- TODO: Validate on keypress -->
+          <Label>Due Date</Label>
+          <DatePicker Height="24" Text="{Binding CurrentAssignment.DueDate}"></DatePicker>
+        </StackPanel>
+        <ListView Grid.Row="1" Name="StudentListView" ItemsSource="{Binding Students}"> <!-- Students -->
+          <ListView.DataContext>
+            <local:StudentViewModel/>
+          </ListView.DataContext>
+          <ListView.View>
+            <GridView>
+              <!-- TODO: Columns -->
+            </GridView>
+          </ListView.View>
+        </ListView>
+        <ListView Grid.Row="2"> <!-- Total/Average -->
+          <ListView.View>
+            <GridView>
+              <!-- TODO: Columns -->
+            </GridView>
+          </ListView.View>
+        </ListView>
+      </Grid>
+    </Grid>
+  </Grid>
+</Window>
